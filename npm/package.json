@@ -1,0 +1,14 @@
+{
+  "name": "node-app",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": ["packages/*"],
+  "dependencies": {
+    "lodash": "4.17.20",
+    "axios": "^0.21.0",
+    "@sindresorhus/is": "~4.0.0"
+  },
+  "devDependencies": {
+    "minimist": "1.2.5"
+  }
+}

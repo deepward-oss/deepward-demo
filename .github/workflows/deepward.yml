@@ -1,0 +1,73 @@
+name: deepward
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DEEPWARD_VERSION: "0.4.0"
+
+jobs:
+  scan:
+    if: github.event_name != 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - name: Install Deepward
+        run: |
+          base="https://github.com/deepward-oss/deepward/releases/download/v${DEEPWARD_VERSION}"
+          archive="deepward_${DEEPWARD_VERSION}_linux_amd64.tar.gz"
+          cd "$RUNNER_TEMP"
+          curl -fsSLO "$base/$archive"
+          curl -fsSLO "$base/checksums.txt"
+          sha256sum --check --ignore-missing checksums.txt
+          tar -xzf "$archive" deepward
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+      # The projects are vulnerable on purpose: the scan reports, it does not gate.
+      - run: deepward scan --format html,json,sarif
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: deepward-report
+          path: deepward-out/
+      - uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: deepward-out/deepward-report.sarif
+
+  fix:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - name: Install Deepward
+        run: |
+          base="https://github.com/deepward-oss/deepward/releases/download/v${DEEPWARD_VERSION}"
+          archive="deepward_${DEEPWARD_VERSION}_linux_amd64.tar.gz"
+          cd "$RUNNER_TEMP"
+          curl -fsSLO "$base/$archive"
+          curl -fsSLO "$base/checksums.txt"
+          sha256sum --check --ignore-missing checksums.txt
+          tar -xzf "$archive" deepward
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+      - run: deepward fix --publish
+        env:
+          DEEPWARD_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

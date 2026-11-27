@@ -1,0 +1,15 @@
+[package]
+name = "app"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+regex = "1.5"
+smallvec = "=1.6.0"
+util = { path = "../util" }
+
+[dev-dependencies]
+hex = "0.4"
+
+[build-dependencies]
+version_check = "0.9"

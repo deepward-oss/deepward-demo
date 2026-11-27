@@ -1,0 +1,6 @@
+[workspace]
+members = ["app", "util"]
+resolver = "2"
+
+[workspace.dependencies]
+itoa = "1"
