@@ -4,7 +4,7 @@
   "private": true,
   "workspaces": ["packages/*"],
   "dependencies": {
-    "lodash": "4.17.20",
+    "lodash": "4.18.1",
     "axios": "^0.21.0",
     "@sindresorhus/is": "~4.0.0"
   },
