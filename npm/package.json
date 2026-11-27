@@ -9,6 +9,6 @@
     "@sindresorhus/is": "~4.0.0"
   },
   "devDependencies": {
-    "minimist": "1.2.5"
+    "minimist": "1.2.8"
   }
 }
